@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+/* ─── Design Tokens ─────────────────────────────── */
+:root {
+  --bg-base:        #080B14;
+  --bg-surface:     #0D1120;
+  --bg-elevated:    #121828;
+
+  --accent-blue:    #4F6EF7;
+  --accent-violet:  #7C5CFC;
+  --accent-cyan:    #38BDF8;
+
+  --text-primary:   #F0F4FF;
+  --text-secondary: rgba(200, 215, 255, 0.55);
+  --text-muted:     rgba(150, 170, 220, 0.35);
+
+  --border-subtle:  rgba(100, 130, 255, 0.08);
+  --border-default: rgba(100, 130, 255, 0.14);
+  --border-bright:  rgba(100, 130, 255, 0.30);
+
+  --glow-blue:      rgba(79, 110, 247, 0.18);
+  --glow-violet:    rgba(124, 92, 252, 0.18);
+
+  --font-geist: 'Geist', sans-serif;
+}
+
+@theme inline {
+  --color-background: var(--bg-base);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-geist);
+}
+
+/* ─── Base ──────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-geist), -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Scrollbar ─────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(79, 110, 247, 0.2);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(79, 110, 247, 0.4);
+}
+
+/* ─── Selection ─────────────────────────────────── */
+::selection {
+  background: rgba(79, 110, 247, 0.3);
+  color: #fff;
+}
+
+/* ─── Utility: Glass Panel ──────────────────────── */
+.glass-panel {
+  background: rgba(13, 17, 32, 0.6);
+  border: 1px solid var(--border-default);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-panel-bright {
+  background: rgba(18, 24, 40, 0.75);
+  border: 1px solid var(--border-bright);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ─── Utility: Gradient Text ────────────────────── */
+.text-gradient {
+  background: linear-gradient(135deg, #7EB9FF 0%, #4F6EF7 40%, #7C5CFC 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-subtle {
+  background: linear-gradient(120deg, #C0D8FF 0%, #8AABFF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Utility: Glow Border ──────────────────────── */
+.glow-border {
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  box-shadow: 0 0 0 1px var(--border-default), 0 0 20px var(--glow-blue);
+}
+
+/* ─── Utility: Button Gradient ──────────────────── */
+.btn-gradient {
+  background: linear-gradient(135deg, #4F6EF7 0%, #7C5CFC 100%);
+  box-shadow: 0 4px 24px rgba(79, 110, 247, 0.30);
+  transition: all 0.2s ease;
+}
+.btn-gradient:hover {
+  box-shadow: 0 6px 32px rgba(79, 110, 247, 0.50);
+  transform: translateY(-1px);
+}
+.btn-gradient:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ─── Utility: Dot Grid Background ─────────────── */
+.dot-grid {
+  background-image: radial-gradient(rgba(79,110,247,0.12) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ─── Animations ────────────────────────────────── */
+@keyframes heroFadeIn {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0);     }
+}
+.hero-fade-in {
+  animation: heroFadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0);     }
+  50%       { transform: translateY(-8px); }
+}
+.floating-node {
+  animation: floatY 5s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 12px var(--glow-blue); }
+  50%       { box-shadow: 0 0 28px var(--glow-violet); }
+}
+.pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.03) 25%,
+    rgba(79,110,247,0.08) 50%,
+    rgba(255,255,255,0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+}
+
+@keyframes progress {
+  from { width: 0%; }
+}
+.animate-progress {
+  animation: progress 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.fade-slide-up {
+  animation: fadeSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes marqueeLeft {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marqueeLeft 20s linear infinite;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* ─── Aurora Glow layers (used in Hero) ─────────── */
+.aurora-blue {
+  background: radial-gradient(ellipse at 70% -10%, rgba(79,110,247,0.22) 0%, transparent 60%);
+}
+.aurora-violet {
+  background: radial-gradient(ellipse at 20% 80%, rgba(124,92,252,0.16) 0%, transparent 55%);
+}
+.aurora-cyan {
+  background: radial-gradient(ellipse at 90% 60%, rgba(56,189,248,0.10) 0%, transparent 40%);
+}
