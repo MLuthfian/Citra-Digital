@@ -1,16 +1,14 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DropZone from '@/components/upload/DropZone';
 import ModelSelector from '@/components/upload/ModelSelector';
 import ResultCard from '@/components/upload/ResultCard';
 import HistoryPanel from '@/components/upload/HistoryPanel';
-import { MODEL_METRICS } from '@/lib/constants';
-import { simulateClassification } from '@/lib/utils';
 import { ClassificationResult } from '@/types';
 import { useClassificationHistory } from '@/hooks/useClassificationHistory';
-import { Loader2, Zap, History, ChevronUp, ChevronDown } from 'lucide-react';
+import { Loader2, Zap, History, ChevronUp, ChevronDown, AlertTriangle } from 'lucide-react';
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -19,6 +17,7 @@ export default function UploadPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ClassificationResult | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const { history, addEntry, clearHistory, removeEntry } = useClassificationHistory();
 
@@ -26,6 +25,7 @@ export default function UploadPage() {
 
   const handleFile = (f: File) => {
     setFile(f);
+    setApiError(null);
     const reader = new FileReader();
     reader.onload = (e) => setFilePreview(e.target?.result as string ?? '');
     reader.readAsDataURL(f);
@@ -35,18 +35,43 @@ export default function UploadPage() {
     if (!canAnalyze) return;
     setLoading(true);
     setResult(null);
+    setApiError(null);
 
-    const model = MODEL_METRICS.find((m) => m.name === selectedModel)!;
-    const delay = 1500 + Math.random() * 1000;
-    await new Promise((res) => setTimeout(res, delay));
+    try {
+      const formData = new FormData();
+      formData.append('image', file as File);
+      formData.append('model', selectedModel as string);
 
-    const simResult = simulateClassification(selectedModel, model.accuracy);
-    const finalResult: ClassificationResult = { ...simResult, modelUsed: selectedModel };
-    setResult(finalResult);
-    setLoading(false);
+      const res = await fetch('/api/classify', {
+        method: 'POST',
+        body: formData,
+      });
 
-    // Save to history
-    if (file) addEntry(finalResult, file, filePreview);
+      const data = await res.json();
+
+      if (!res.ok) {
+        setApiError(data.error ?? 'Terjadi kesalahan saat klasifikasi.');
+        setLoading(false);
+        return;
+      }
+
+      const finalResult: ClassificationResult = {
+        label:            (data.label as 'BANJIR' | 'KEBAKARAN') ?? 'BANJIR',
+        confidence:       Number(data.confidence) || 0,
+        floodProbability: Number(data.floodProbability) || 0,
+        fireProbability:  Number(data.fireProbability) || 0,
+        inferenceTime:    Number(data.inferenceTime) || 0,
+        modelUsed:        data.modelUsed ?? (selectedModel as string),
+      };
+
+      setResult(finalResult);
+      if (file) addEntry(finalResult, file, filePreview);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Network error';
+      setApiError(`Gagal menghubungi API: ${msg}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleReset = () => setResult(null);
@@ -93,6 +118,27 @@ export default function UploadPage() {
               Upload foto lokasi/kondisi bencana dan pilih model untuk mendapatkan hasil klasifikasi secara instan.
             </p>
           </div>
+
+          {/* API Error Banner */}
+          <AnimatePresence>
+            {apiError && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3 }}
+                className="mb-4 flex items-start gap-3 px-4 py-3 rounded-xl text-sm"
+                style={{
+                  background: 'rgba(239,68,68,0.10)',
+                  border: '1px solid rgba(239,68,68,0.30)',
+                  color: '#fca5a5',
+                }}
+              >
+                <AlertTriangle size={16} className="flex-shrink-0 mt-0.5" style={{ color: '#f87171' }} />
+                <span>{apiError}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {!result ? (
             <div className="space-y-6">
