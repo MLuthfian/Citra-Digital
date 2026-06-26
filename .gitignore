@@ -30,7 +30,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files
 .env*
 
 # vercel
@@ -39,3 +39,33 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ─── Model files (ukuran besar, tidak perlu di-upload ke GitHub) ───
+/database/*.keras
+/database/*.h5
+/database/*.pt
+/database/*.pth
+/database/*.pkl
+/database/*.db
+/database/*.sqlite
+
+# ─── Python cache ──────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+*.spec
+
+# ─── AI / Agent config (hanya untuk lokal, bukan bagian kode) ──────
+/.claude/
+CLAUDE.md
+AGENTS.md
+
+# ─── Editor config (spesifik lokal) ────────────────────────────────
+/.vscode/
+
+# ─── Folder public kosong (tidak ada aset yang dipakai) ────────────
+/public/
